@@ -4,6 +4,7 @@ from mpl_toolkits.mplot3d import Axes3D
 import os
 path = os.path.dirname(os.path.abspath(__file__))
 images_path = path + '/images/'
+frames_path = path + '/frames/'
 
 
 def torus(nx = 100, ny=100, r=1, R=2):
@@ -60,11 +61,13 @@ def catmap(path, iterations, keep_all=False, name="arnold_cat-{name}-{index}.png
     title = os.path.splitext(os.path.split(path)[1])[0]
     n_nums = len(str(iterations)) # number of digits in iterations (for padding)
     counter = 0
+    base_image_path = images_path+path
+    image_path = base_image_path
     while counter < iterations:
-        with load_pic(images_path+path) as image:
+        with load_pic(image_path) as image:
             if counter == 0:
                 #re-save original image using the same name
-                image.save(images_path+name.format(name=title, index='0'*n_nums))
+                image.save(frames_path+name.format(name=title, index='0'*n_nums))
 
             dim = width, height = image.size
             with new_pic(image.mode, dim) as canvas:
@@ -77,11 +80,12 @@ def catmap(path, iterations, keep_all=False, name="arnold_cat-{name}-{index}.png
                         canvas.putpixel((nx, height-ny-1), pixel)
 
         if counter > 0 and not keep_all:
-            os.remove(images_path+path)
+            os.remove(image_path)
         counter += 1
         print(counter, end="\r")
         path = name.format(name=title, index=str(counter).rjust(n_nums, '0'))
-        canvas.save(images_path+path)
+        image_path = frames_path+path
+        canvas.save(image_path)
 
     return canvas
 
@@ -102,9 +106,9 @@ def make_circle(r, n):
 
 
 if __name__ == '__main__':
-    circle = make_circle(10, 100)
-    save_image(circle, filename='circle.png')
+    circle = make_circle(50, 500)
+    save_image(circle, filename='circle_500.png')
     #image = load_image(images_path + 'cat-stretching.png') #image = np.transpose(image, (1, 0, 2))
-    canvas = catmap('circle.png', 100, keep_all=True)
+    canvas = catmap('circle_500.png', 5, keep_all=True)
     # plot_image_on_torus(image, filename='catmap_torus.png')
     # plot_image(image, filename='catmap.png')
